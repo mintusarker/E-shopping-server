@@ -32,6 +32,22 @@ async function run() {
             res.send(result);
         })
 
+        app.get("/search/:key", async (req, res) => {
+            console.log(req.params);
+            let result = await productCollection.find(
+                {
+                    "$or": [
+                        {
+                            category: { $regex: req.params.key }
+                        },
+                        {
+                            name: { $regex: req.params.key }
+                        },
+                    ]
+                }).toArray();
+            res.send(result)
+        });
+
     } finally {
 
     }
