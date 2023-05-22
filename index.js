@@ -27,25 +27,29 @@ async function run() {
 
 
         app.get('/products', async (req, res) => {
+            const page = parseInt(req.query.page);
+            const size = parseInt(req.query.size);
+            // console.log(page, size);
             const query = {};
-            const result = await productCollection.find(query).toArray();
-            res.send(result);
+            const result = await productCollection.find(query).skip(page * size).limit(size).toArray();
+            const count = await productCollection.estimatedDocumentCount();
+            res.send({ count, result });
         })
 
+        //search Api
         app.get("/search/:key", async (req, res) => {
-            console.log(req.params);
             let result = await productCollection.find(
                 {
                     "$or": [
                         {
                             category: { $regex: req.params.key }
                         },
-                        {
-                            name: { $regex: req.params.key }
-                        },
+                        // {
+                        //     name: { $regex: req.params.key }
+                        // },
                     ]
                 }).toArray();
-            res.send(result)
+            res.send(result);
         });
 
     } finally {
